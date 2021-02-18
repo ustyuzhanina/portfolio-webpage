@@ -1,0 +1,8 @@
+@import url(./vendor/normalize.css);
+/* fonts
+blocks */
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
