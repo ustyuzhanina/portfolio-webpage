@@ -4,18 +4,31 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio Webpage</title>
-  <meta name="author" content="Elena Ustyuzhanina">
-  <meta name="description" content="This is a personal portfolio webpage of Elena Ustyuzhanina">
-  <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.index.css%>">
-  <!-- <link rel="shortcut icon" href="<%=require('./images/favicon.png')%>" type="image/png"> -->
+  <title>Portfolio Webpage - <%= htmlWebpackPlugin.options.title %></title>
+  <link rel="icon" href="./images/static/favicon.png" type="image/png">
 </head>
 <body>
-  
-  <div class="page">
 
+  <div class="page">
   </div>
 
-  <script src="<%= htmlWebpackPlugin.files.chunks.index.entry%>"></script>
+  <h1>Webpack. Basic tuning</h1>
+
+  <hr>
+
+  <h2>This is h2</h2>
+  <h3>And this is h3</h3>
+
+  <div class="px-4 py-5 my-5 text-center card">
+    <p>
+    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nobis animi magni natus ullam, quia quod harum iure reprehenderit debitis, nisi ab numquam, eveniet quae. Quam soluta porro inventore distinctio consequatur.
+    </p>
+  </div>    
+
+  <div class="author"></div>
+
+
+
+  
 </body>
 </html>

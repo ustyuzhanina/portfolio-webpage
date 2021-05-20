@@ -1,49 +1,129 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackMd5Hash = require('webpack-md5-hash');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const CssNano = require('cssnano');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const WebpackDevServer = require('webpack-dev-server');
+const WebpackMd5Hash = require('webpack-md5-hash');
+const HtmlWebpackInjector = require('html-webpack-injector');
 
 const isDev = process.env.NODE_ENV === 'development';
-// создаем переменную для development-сборки
+const isProd = !isDev;
+
+const isOptimization = () => {
+  const config = {
+    splitChunks: {
+      chunks: 'all',
+    }    
+  }
+
+  if (isProd) {
+    config.minimize = true,
+    config.minimizer = [
+      new OptimizeCssAssetsPlugin(),
+      new TerserWebpackPlugin(),
+    ]
+  }
+
+  return config;
+}
+
+const cssLoaders = (extra) => {
+  const loaders = [
+    // style-loader adds stylesheet to HEAD in HTML, and mini-css extracts data to a sep file
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        // we can change objects without reloading a page
+        hmr: isDev,
+        reloadAll: true,
+      }
+    },
+    // reads css
+    'css-loader',
+  ];
+
+  if (extra) {
+    loaders.push(extra);
+  }
+
+  return loaders;
+}
 
 module.exports = {
+
+  context: path.resolve(__dirname, 'src'),
+
   entry: {
-    index: './src/index.js',
-    // articles: './src/articles/index.js',
+    index: './index.js',
   },
+
   output: {
+    filename: 'script/[name].[hash].js',
     path: path.resolve(__dirname, 'dist'),
-    filename: 'script/[name].[chunkhash].js',
+    // publicPath: '/dist' ,   
   },
+
+  devServer: {
+    overlay: true,
+    hot: isDev,
+    port: 4200,
+  },
+
+  plugins: [
+
+    new CleanWebpackPlugin(),
+
+    new HtmlWebpackPlugin({
+      title: 'Home',
+      template: './index.html',
+      minify: {
+        collapseWhitespace: isProd,
+      }
+    }),
+
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash].css',
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'assets/images/static/',
+          to: '../dist/images/static',
+        }
+      ]
+    })
+  ],
+
   module: {
     rules: [
+
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: { loader: 'babel-loader' },
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        },
       },
+
       {
-        test: /\.css$/i,
-        use: [
-          isDev
-            ? 'style-loader'
-            : {
-              loader: MiniCssExtractPlugin.loader,
-              options: {
-                publicPath: '../',
-              },
-            },
-          {
-            loader: 'css-loader',
-            options: {
-              importLoaders: 2,
-            },
-          },
-          'postcss-loader'],
+        test: /\.s[ac]ss$/,
+        use: cssLoaders('sass-loader'),
       },
+
+      {
+        test: /\.css$/,
+        use: cssLoaders(),
+      },
+
+      //images
       {
         test: /\.(png|jpe?g|gif|ico|svg)$/i,
         use: [
@@ -51,7 +131,10 @@ module.exports = {
             loader: 'file-loader',
             options: {
               esModule: false,
-              name: 'images/[name].[ext]',
+              name: '[name].[ext]',
+              outputPath: 'images',
+              publicPath: '../images/',
+              emitFile: true,
             },
           },
           {
@@ -82,6 +165,8 @@ module.exports = {
           },
         ],
       },
+
+      //fonts
       {
         test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
@@ -93,32 +178,11 @@ module.exports = {
           },
         ],
       },
-    ],
+
+
+    ]
   },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'css/[name].[contenthash].css',
-    }),
-    new OptimizeCssAssetsPlugin({
-      assetNameRegExp: /\.css$/g,
-      cssProcessor: CssNano,
-      cssProcessorPluginOptions: {
-        preset: ['default'],
-      },
-      canPrint: true,
-    }),
-    new HtmlWebpackPlugin({
-      // Означает, что:
-      inject: false, // стили НЕ нужно прописывать внутри тегов
-      template: './src/index.html', // откуда брать образец для сравнения с текущим видом проекта
-      filename: 'index.html', // имя выходного файла, то есть того, что окажется в папке dist после сборки
-      chunks: [
-        'index',
-      ],
-    }),
-    new WebpackMd5Hash(),
-    new webpack.DefinePlugin({
-      NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    }),
-  ],
+
+  optimization: isOptimization(),
+
 };
