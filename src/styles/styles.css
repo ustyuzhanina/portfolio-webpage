@@ -1,5 +1,4 @@
 @import '~normalize.css';
-@import '~bootstrap';
 @import './fonts.css';
 div {
   border: 1px solid green;
@@ -25,7 +24,7 @@ h2 {
 }
 
 .author {
-  background-image: url('../assets/images/favicon.png');
+  background-image: url('../assets/images/author.jpg');
   background-size: cover;
   height: 200px;
   width: 200px;

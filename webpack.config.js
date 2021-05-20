@@ -7,6 +7,7 @@ const MinifyPlugin = require('babel-minify-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const WebpackDevServer = require('webpack-dev-server');
 const WebpackMd5Hash = require('webpack-md5-hash');
 const HtmlWebpackInjector = require('html-webpack-injector');
@@ -74,6 +75,8 @@ module.exports = {
     port: 4200,
   },
 
+  devtool: isDev ? 'source-map' : '',
+
   plugins: [
 
     new CleanWebpackPlugin(),
@@ -89,6 +92,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css',
     }),
+
     new CopyPlugin({
       patterns: [
         {
@@ -96,7 +100,9 @@ module.exports = {
           to: '../dist/images/static',
         }
       ]
-    })
+    }),
+
+    new ESLintPlugin(),
   ],
 
   module: {

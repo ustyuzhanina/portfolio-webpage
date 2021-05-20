@@ -3,6 +3,7 @@
 /dist
 .vsls.json
 .bemrc.js
+stats.json
 
 # Logs
 logs

@@ -1,5 +1,2 @@
-$border: 4px solid maroon;
-
-.author {
-  border: $border;
-}
+@import "custom";
+@import "~bootstrap/scss/bootstrap";
