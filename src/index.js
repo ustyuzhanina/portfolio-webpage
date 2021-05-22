@@ -1,5 +1,5 @@
-import './styles/styles.css';
-import './styles/sass.scss';
-import { Tooltip, Toast, Popover } from 'bootstrap';
+import "./styles/styles.css";
+import "./styles/sass.scss";
+import { Tooltip, Toast, Popover } from "bootstrap";
 
-import './js/common';
+import "./js/common";
